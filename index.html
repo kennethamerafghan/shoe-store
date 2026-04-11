@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SOLÉ — Shoe Collection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --black: #0a0a0a; --white: #f5f3ef; --cream: #e8e4dc; --accent: #c8a96e; --gray: #888; --light-gray: #d4d0c8; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--black); overflow-x: hidden; }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; background: rgba(245,243,239,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--light-gray); }
+    .logo { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; letter-spacing: 0.1em; color: var(--black); text-decoration: none; cursor: pointer; }
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--black); font-size: 0.85rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.3s; cursor: pointer; }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+
+    /* PAGES */
+    .page { display: none; }
+    .page.active { display: block; animation: fadeUp 0.6s ease both; }
+
+    /* HOME */
+    .hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; padding-top: 80px; }
+    .hero-text { display: flex; flex-direction: column; justify-content: center; padding: 6rem 4rem 6rem 6rem; }
+    .hero-tag { font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(3rem, 5vw, 5.5rem); font-weight: 900; line-height: 1.05; margin-bottom: 1.5rem; }
+    .hero-title em { font-style: italic; color: var(--accent); }
+    .hero-desc { font-size: 1rem; color: var(--gray); line-height: 1.8; max-width: 420px; margin-bottom: 3rem; font-weight: 300; }
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary { background: var(--black); color: var(--white); padding: 1rem 2.2rem; border: none; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: background 0.3s, transform 0.2s; display: inline-block; }
+    .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
+    .btn-outline { background: transparent; color: var(--black); padding: 1rem 2.2rem; border: 1.5px solid var(--black); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; text-decoration: none; transition: all 0.3s; display: inline-block; }
+    .btn-outline:hover { background: var(--black); color: var(--white); }
+    .hero-visual { background: var(--cream); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .hero-shoe-emoji { font-size: 10rem; display: block; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15)); text-align: center; }
+    .hero-shoe-label { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--gray); margin-top: 1.5rem; letter-spacing: 0.1em; text-align: center; }
+    .hero-badge { position: absolute; bottom: 3rem; right: 3rem; width: 90px; height: 90px; border-radius: 50%; background: var(--black); color: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; text-align: center; line-height: 1.5; animation: spin 12s linear infinite; }
+    .marquee-wrap { background: var(--black); padding: 1rem 0; overflow: hidden; white-space: nowrap; }
+    .marquee-track { display: inline-block; animation: marquee 20s linear infinite; }
+    .marquee-track span { font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; margin: 0 2rem; color: var(--accent); }
+    .marquee-track span.dot { color: var(--white); margin: 0 0.5rem; }
+
+    /* ABOUT */
+    .page-hero { background: var(--cream); padding: 10rem 6rem 5rem; text-align: center; }
+    .page-tag { font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+    .page-title { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 900; line-height: 1.1; }
+    .page-title em { font-style: italic; color: var(--accent); }
+    .about-main { padding: 6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; }
+    .about-image { background: var(--cream); height: 480px; display: flex; align-items: center; justify-content: center; font-size: 9rem; position: relative; }
+    .about-image::after { content: ''; position: absolute; bottom: -16px; right: -16px; width: 100%; height: 100%; border: 2px solid var(--accent); z-index: -1; }
+    .about-tag { font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+    .about-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; line-height: 1.2; margin-bottom: 1.5rem; }
+    .about-desc { font-size: 0.95rem; color: var(--gray); line-height: 1.9; margin-bottom: 1.2rem; font-weight: 300; }
+    .about-stats { display: flex; gap: 3rem; margin-top: 2.5rem; flex-wrap: wrap; }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 900; color: var(--accent); }
+    .stat-label { font-size: 0.8rem; color: var(--gray); letter-spacing: 0.1em; text-transform: uppercase; }
+    .values-section { background: var(--black); padding: 6rem; color: var(--white); }
+    .values-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem; }
+    .values-sub { text-align: center; color: var(--gray); font-size: 0.95rem; margin-bottom: 4rem; }
+    .values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
+    .value-card { background: rgba(255,255,255,0.05); padding: 2.5rem; border: 1px solid rgba(255,255,255,0.08); transition: border-color 0.3s; }
+    .value-card:hover { border-color: var(--accent); }
+    .value-icon { font-size: 2.5rem; margin-bottom: 1.2rem; }
+    .value-name { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 0.8rem; }
+    .value-desc { font-size: 0.88rem; color: var(--gray); line-height: 1.8; font-weight: 300; }
+
+    /* COLLECTION */
+    .collection-section { padding: 4rem 6rem 6rem; }
+    .filter-bar { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 3rem; }
+    .filter-btn { padding: 0.5rem 1.4rem; border: 1.5px solid var(--light-gray); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.3s; color: var(--black); }
+    .filter-btn.active, .filter-btn:hover { background: var(--black); color: var(--white); border-color: var(--black); }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+    .product-card { background: var(--cream); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
+    .product-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+    .product-img { background: var(--white); height: 220px; display: flex; align-items: center; justify-content: center; font-size: 5rem; position: relative; }
+    .product-badge { position: absolute; top: 1rem; left: 1rem; background: var(--accent); color: var(--white); font-size: 0.65rem; padding: 0.3rem 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
+    .product-info { padding: 1.5rem; }
+    .product-brand { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; font-weight: 500; }
+    .product-name { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .product-desc { font-size: 0.82rem; color: var(--gray); line-height: 1.6; margin-bottom: 1rem; font-weight: 300; }
+    .product-footer { display: flex; justify-content: space-between; align-items: center; }
+    .product-price { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
+    .add-btn { background: var(--black); color: var(--white); border: none; padding: 0.6rem 1.2rem; font-family: 'DM Sans', sans-serif; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.3s; }
+    .add-btn:hover { background: var(--accent); }
+
+    /* CONTACT */
+    .contact-section { padding: 6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start; }
+    .contact-tag { font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+    .contact-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 700; line-height: 1.2; margin-bottom: 1.5rem; }
+    .contact-desc { font-size: 0.95rem; color: var(--gray); line-height: 1.9; font-weight: 300; margin-bottom: 2.5rem; }
+    .contact-detail { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--gray); }
+    .contact-detail-icon { font-size: 1.3rem; }
+    .contact-detail-text strong { display: block; color: var(--black); font-weight: 500; margin-bottom: 0.2rem; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .contact-form { display: flex; flex-direction: column; gap: 1.2rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group label { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 500; color: var(--black); }
+    .form-group input, .form-group textarea, .form-group select { padding: 0.9rem 1rem; border: 1.5px solid var(--light-gray); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--black); outline: none; transition: border-color 0.3s; width: 100%; }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
+    .form-group textarea { resize: vertical; min-height: 130px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-submit { background: var(--black); color: var(--white); padding: 1rem; border: none; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: background 0.3s; width: 100%; }
+    .form-submit:hover { background: var(--accent); }
+
+    /* FOOTER */
+    footer { background: var(--black); color: var(--white); padding: 3rem 6rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 900; letter-spacing: 0.1em; }
+    .footer-logo span { color: var(--accent); }
+    .footer-text { font-size: 0.8rem; color: var(--gray); }
+    .footer-links { display: flex; gap: 2rem; list-style: none; }
+    .footer-links a { color: var(--gray); text-decoration: none; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.3s; cursor: pointer; }
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { padding: 1.2rem 2rem; }
+      .nav-links { gap: 1.2rem; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-text { padding: 5rem 2rem 2rem; }
+      .hero-visual { min-height: 300px; }
+      .page-hero { padding: 8rem 2rem 3rem; }
+      .about-main { grid-template-columns: 1fr; padding: 4rem 2rem; gap: 3rem; }
+      .values-section { padding: 4rem 2rem; }
+      .values-grid { grid-template-columns: 1fr; }
+      .collection-section { padding: 3rem 2rem; }
+      .contact-section { grid-template-columns: 1fr; padding: 4rem 2rem; gap: 3rem; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { padding: 2rem; flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .nav-links { gap: 0.8rem; }
+      .nav-links a { font-size: 0.75rem; }
+      .hero-shoe-emoji { font-size: 6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="logo" onclick="showPage('home')">SOL<span>É</span></span>
+    <ul class="nav-links">
+      <li><a onclick="showPage('about')" id="nav-about">About</a></li>
+      <li><a onclick="showPage('collection')" id="nav-collection">Collection</a></li>
+      <li><a onclick="showPage('contact')" id="nav-contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- ===== HOME PAGE ===== -->
+  <div class="page active" id="page-home">
+    <section class="hero">
+      <div class="hero-text">
+        <p class="hero-tag">✦ Premium Shoe Collection</p>
+        <h1 class="hero-title">Step Into <em>Your</em> Style</h1>
+        <p class="hero-desc">Explore a curated collection of the world's finest footwear — from iconic streetwear brands to timeless classics. Every step tells your story.</p>
+        <div class="hero-btns">
+          <span class="btn-primary" onclick="showPage('collection')">Shop Collection</span>
+          <span class="btn-outline" onclick="showPage('about')">Our Story</span>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div>
+          <span class="hero-shoe-emoji">👟</span>
+          <p class="hero-shoe-label">New Arrivals 2025</p>
+        </div>
+        <div class="hero-badge">New<br>Season<br>✦</div>
+      </div>
+    </section>
+    <div class="marquee-wrap">
+      <div class="marquee-track">
+        <span>Nike</span><span class="dot">•</span><span>Adidas</span><span class="dot">•</span><span>Puma</span><span class="dot">•</span><span>New Balance</span><span class="dot">•</span><span>Vans</span><span class="dot">•</span><span>Converse</span><span class="dot">•</span><span>Jordan</span><span class="dot">•</span><span>Reebok</span><span class="dot">•</span><span>Nike</span><span class="dot">•</span><span>Adidas</span><span class="dot">•</span><span>Puma</span><span class="dot">•</span><span>New Balance</span><span class="dot">•</span><span>Vans</span><span class="dot">•</span><span>Converse</span><span class="dot">•</span><span>Jordan</span><span class="dot">•</span><span>Reebok</span><span class="dot">•</span>
+      </div>
+    </div>
+    <footer>
+      <div class="footer-logo">SOL<span>É</span></div>
+      <p class="footer-text">© 2025 SOLÉ Shoe Collection. All rights reserved.</p>
+      <ul class="footer-links">
+        <li><a onclick="showPage('about')">About</a></li>
+        <li><a onclick="showPage('collection')">Collection</a></li>
+        <li><a onclick="showPage('contact')">Contact</a></li>
+      </ul>
+    </footer>
+  </div>
+
+  <!-- ===== ABOUT PAGE ===== -->
+  <div class="page" id="page-about">
+    <div class="page-hero">
+      <p class="page-tag">✦ Our Story</p>
+      <h1 class="page-title">Crafted for Those Who Walk with <em>Purpose</em></h1>
+    </div>
+    <section class="about-main">
+      <div class="about-image">👠</div>
+      <div>
+        <p class="about-tag">✦ Who We Are</p>
+        <h2 class="about-title">More Than Just a Shoe Store</h2>
+        <p class="about-desc">SOLÉ is a curated shoe boutique dedicated to bringing you the finest footwear from the world's most iconic brands. We believe that the right pair of shoes doesn't just complete an outfit — it defines a lifestyle.</p>
+        <p class="about-desc">From the streets of New York to the courts of Tokyo, our collection spans every style, every culture, and every occasion. We handpick each pair for quality, design, and authenticity.</p>
+        <p class="about-desc">Founded with a passion for footwear and a commitment to excellence, SOLÉ has become the go-to destination for shoe lovers who refuse to compromise.</p>
+        <div class="about-stats">
+          <div><div class="stat-num">200+</div><div class="stat-label">Styles</div></div>
+          <div><div class="stat-num">8</div><div class="stat-label">Top Brands</div></div>
+          <div><div class="stat-num">5K+</div><div class="stat-label">Happy Customers</div></div>
+        </div>
+      </div>
+    </section>
+    <section class="values-section">
+      <h2 class="values-title">Our Values</h2>
+      <p class="values-sub">What drives everything we do</p>
+      <div class="values-grid">
+        <div class="value-card"><div class="value-icon">✦</div><h3 class="value-name">Quality First</h3><p class="value-desc">Every shoe is carefully selected for its craftsmanship, materials, and durability. We never compromise on quality.</p></div>
+        <div class="value-card"><div class="value-icon">👟</div><h3 class="value-name">Authentic Style</h3><p class="value-desc">We curate only genuine, authentic footwear from the world's most trusted brands — no fakes, no shortcuts.</p></div>
+        <div class="value-card"><div class="value-icon">🤝</div><h3 class="value-name">Customer First</h3><p class="value-desc">Your satisfaction is our priority. From browsing to delivery, we ensure a seamless and enjoyable experience every time.</p></div>
+      </div>
+    </section>
+    <footer>
+      <div class="footer-logo">SOL<span>É</span></div>
+      <p class="footer-text">© 2025 SOLÉ Shoe Collection. All rights reserved.</p>
+      <ul class="footer-links">
+        <li><a onclick="showPage('about')">About</a></li>
+        <li><a onclick="showPage('collection')">Collection</a></li>
+        <li><a onclick="showPage('contact')">Contact</a></li>
+      </ul>
+    </footer>
+  </div>
+
+  <!-- ===== COLLECTION PAGE ===== -->
+  <div class="page" id="page-collection">
+    <div class="page-hero">
+      <p class="page-tag">✦ Our Shoes</p>
+      <h1 class="page-title">The <em>Collection</em></h1>
+    </div>
+    <section class="collection-section">
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
+        <button class="filter-btn" onclick="filterProducts('nike', this)">Nike</button>
+        <button class="filter-btn" onclick="filterProducts('adidas', this)">Adidas</button>
+        <button class="filter-btn" onclick="filterProducts('puma', this)">Puma</button>
+        <button class="filter-btn" onclick="filterProducts('vans', this)">Vans</button>
+        <button class="filter-btn" onclick="filterProducts('converse', this)">Converse</button>
+        <button class="filter-btn" onclick="filterProducts('jordan', this)">Jordan</button>
+      </div>
+      <div class="products-grid" id="productsGrid"></div>
+    </section>
+    <footer>
+      <div class="footer-logo">SOL<span>É</span></div>
+      <p class="footer-text">© 2025 SOLÉ Shoe Collection. All rights reserved.</p>
+      <ul class="footer-links">
+        <li><a onclick="showPage('about')">About</a></li>
+        <li><a onclick="showPage('collection')">Collection</a></li>
+        <li><a onclick="showPage('contact')">Contact</a></li>
+      </ul>
+    </footer>
+  </div>
+
+  <!-- ===== CONTACT PAGE ===== -->
+  <div class="page" id="page-contact">
+    <div class="page-hero">
+      <p class="page-tag">✦ Get In Touch</p>
+      <h1 class="page-title">We'd Love to <em>Hear</em> From You</h1>
+    </div>
+    <section class="contact-section">
+      <div>
+        <p class="contact-tag">✦ Contact Info</p>
+        <h2 class="contact-title">Visit Us or Send a Message</h2>
+        <p class="contact-desc">Have questions about a product, sizing, or delivery? Our team is always happy to help. We'll get back to you within 24 hours.</p>
+        <div class="contact-detail"><span class="contact-detail-icon">📍</span><div class="contact-detail-text"><strong>Address</strong>Tomas Oppus, Southern Leyte, Philippines</div></div>
+        <div class="contact-detail"><span class="contact-detail-icon">📧</span><div class="contact-detail-text"><strong>Email</strong>hello@sole-collection.com</div></div>
+        <div class="contact-detail"><span class="contact-detail-icon">📞</span><div class="contact-detail-text"><strong>Phone</strong>+63 912 345 6789</div></div>
+        <div class="contact-detail"><span class="contact-detail-icon">🕐</span><div class="contact-detail-text"><strong>Store Hours</strong>Monday – Saturday, 9:00 AM – 6:00 PM</div></div>
+      </div>
+      <div class="contact-form">
+        <div class="form-row">
+          <div class="form-group"><label>First Name</label><input type="text" placeholder="Juan" /></div>
+          <div class="form-group"><label>Last Name</label><input type="text" placeholder="Dela Cruz" /></div>
+        </div>
+        <div class="form-group"><label>Email Address</label><input type="email" placeholder="your@email.com" /></div>
+        <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="+63 900 000 0000" /></div>
+        <div class="form-group">
+          <label>Subject</label>
+          <select>
+            <option value="">Select a topic...</option>
+            <option>Product Inquiry</option>
+            <option>Order Status</option>
+            <option>Returns and Exchange</option>
+            <option>Sizing Help</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Message</label><textarea placeholder="Write your message here..."></textarea></div>
+        <button class="form-submit" onclick="submitForm()">Send Message</button>
+      </div>
+    </section>
+    <footer>
+      <div class="footer-logo">SOL<span>É</span></div>
+      <p class="footer-text">© 2025 SOLÉ Shoe Collection. All rights reserved.</p>
+      <ul class="footer-links">
+        <li><a onclick="showPage('about')">About</a></li>
+        <li><a onclick="showPage('collection')">Collection</a></li>
+        <li><a onclick="showPage('contact')">Contact</a></li>
+      </ul>
+    </footer>
+  </div>
+
+  <script>
+    var products = [
+      { brand: 'nike', name: 'Air Max 270', desc: 'Iconic Air cushioning meets a bold silhouette for all-day comfort.', price: 'P7,995', emoji: '👟', badge: 'Bestseller' },
+      { brand: 'nike', name: 'React Infinity Run', desc: 'Engineered for long-distance with adaptive foam technology.', price: 'P8,499', emoji: '👟', badge: 'New' },
+      { brand: 'nike', name: 'Air Force 1', desc: 'The legendary basketball shoe turned street style icon.', price: 'P6,295', emoji: '👟', badge: '' },
+      { brand: 'adidas', name: 'Ultraboost 23', desc: 'Responsive Boost midsole with Primeknit upper for ultimate fit.', price: 'P9,299', emoji: '👟', badge: 'Popular' },
+      { brand: 'adidas', name: 'Stan Smith', desc: 'The timeless classic that defined generations of streetwear.', price: 'P4,995', emoji: '👞', badge: '' },
+      { brand: 'adidas', name: 'Gazelle Bold', desc: 'A modern take on the Gazelle silhouette with platform sole.', price: 'P5,499', emoji: '👟', badge: 'New' },
+      { brand: 'puma', name: 'Suede Classic', desc: 'A streetwear icon with premium suede upper and cupsole design.', price: 'P4,299', emoji: '👟', badge: 'Classic' },
+      { brand: 'puma', name: 'RS-X Reinvention', desc: 'Bold chunky sole with retro-futuristic design and comfort.', price: 'P5,299', emoji: '👟', badge: '' },
+      { brand: 'vans', name: 'Old Skool', desc: 'The original side stripe sneaker. A skate legend since 1977.', price: 'P3,995', emoji: '👟', badge: '' },
+      { brand: 'vans', name: 'Slip-On Checkerboard', desc: 'Easy-on design with the iconic checkerboard print.', price: 'P3,299', emoji: '👟', badge: 'Classic' },
+      { brand: 'converse', name: 'Chuck Taylor All Star', desc: 'The most iconic sneaker ever made. Timeless in every colorway.', price: 'P3,499', emoji: '👟', badge: 'Iconic' },
+      { brand: 'converse', name: 'Run Star Hike', desc: 'Chuck Taylor DNA meets a bold chunky lug sole for a statement look.', price: 'P4,799', emoji: '👟', badge: 'New' },
+      { brand: 'jordan', name: 'Air Jordan 1 Retro High', desc: 'The shoe that started a revolution. High-top heritage design.', price: 'P12,995', emoji: '🏀', badge: 'Limited' },
+      { brand: 'jordan', name: 'Air Jordan 4 Retro', desc: 'Wings on the collar, mesh on the upper — an icon reimagined.', price: 'P14,995', emoji: '🏀', badge: 'Limited' }
+    ];
+
+    function showPage(page) {
+      // Hide all pages
+      var pages = document.querySelectorAll('.page');
+      for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+
+      // Remove active from all nav links
+      var navLinks = document.querySelectorAll('.nav-links a');
+      for (var i = 0; i < navLinks.length; i++) navLinks[i].classList.remove('active');
+
+      // Show target page
+      document.getElementById('page-' + page).classList.add('active');
+
+      // Set active nav
+      var navEl = document.getElementById('nav-' + page);
+      if (navEl) navEl.classList.add('active');
+
+      // Render products when collection is shown
+      if (page === 'collection') renderProducts('all');
+
+      // Scroll to top
+      window.scrollTo(0, 0);
+    }
+
+    function renderProducts(filter) {
+      var grid = document.getElementById('productsGrid');
+      var filtered = filter === 'all' ? products : products.filter(function(p) { return p.brand === filter; });
+      var html = '';
+      for (var i = 0; i < filtered.length; i++) {
+        var p = filtered[i];
+        html += '<div class="product-card">';
+        html += '<div class="product-img"><span style="font-size:4rem">' + p.emoji + '</span>';
+        if (p.badge) html += '<span class="product-badge">' + p.badge + '</span>';
+        html += '</div><div class="product-info">';
+        html += '<p class="product-brand">' + p.brand.toUpperCase() + '</p>';
+        html += '<h3 class="product-name">' + p.name + '</h3>';
+        html += '<p class="product-desc">' + p.desc + '</p>';
+        html += '<div class="product-footer"><span class="product-price">' + p.price + '</span>';
+        html += '<button class="add-btn" onclick="addToCart(\'' + p.name.replace(/'/g, "\\'") + '\')">Add to Cart</button>';
+        html += '</div></div></div>';
+      }
+      grid.innerHTML = html;
+    }
+
+    function filterProducts(brand, btn) {
+      var btns = document.querySelectorAll('.filter-btn');
+      for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+      btn.classList.add('active');
+      renderProducts(brand);
+    }
+
+    function addToCart(name) {
+      alert('Added "' + name + '" to cart!');
+    }
+
+    function submitForm() {
+      alert('Message sent! We will get back to you within 24 hours. Thank you!');
+    }
+  </script>
+</body>
+</html>
