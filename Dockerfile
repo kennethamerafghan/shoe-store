@@ -13,9 +13,11 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 RUN touch database/database.sqlite
+RUN mkdir -p /opt/render/project/src/database
+RUN touch /opt/render/project/src/database/database.sqlite
 
 RUN php artisan migrate --force
-RUN mkdir -p database && touch database/database.sqlite
+
 
 RUN chmod -R 775 storage bootstrap/cache
 
