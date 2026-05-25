@@ -14,6 +14,10 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN touch database/database.sqlite
 
+RUN php artisan migrate --force
+
+RUN chmod -R 775 storage bootstrap/cache
+
 RUN php artisan config:clear
 RUN php artisan cache:clear
 RUN php artisan view:clear
