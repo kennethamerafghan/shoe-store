@@ -15,6 +15,7 @@ RUN composer install --no-dev --optimize-autoloader
 RUN touch database/database.sqlite
 
 RUN php artisan migrate --force
+RUN mkdir -p database && touch database/database.sqlite
 
 RUN chmod -R 775 storage bootstrap/cache
 
