@@ -12,18 +12,12 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
+RUN mkdir -p database
 RUN touch database/database.sqlite
-RUN mkdir -p /opt/render/project/src/database
-RUN touch /opt/render/project/src/database/database.sqlite
 
-RUN php artisan migrate --force
+RUN chmod -R 775 storage bootstrap/cache database
 
-
-RUN chmod -R 775 storage bootstrap/cache
-
-RUN php artisan config:clear
-RUN php artisan cache:clear
-RUN php artisan view:clear
+RUN php artisan migrate:fresh --force
 
 EXPOSE 10000
 

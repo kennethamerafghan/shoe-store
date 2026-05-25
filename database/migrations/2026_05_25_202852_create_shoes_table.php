@@ -13,6 +13,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('brand');
             $table->decimal('price', 8, 2);
+            $table->string('size')->nullable();
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }
